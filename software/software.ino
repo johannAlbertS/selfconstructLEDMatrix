@@ -9,6 +9,7 @@
 #define MATRIX_WEIGHT 4
 
 boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT];
+boolean slide[8][MATRIX_WEIGHT];
 
 void resetAll() {
   digitalWrite(ROW1, LOW);
@@ -59,28 +60,33 @@ void setup() {
   pinMode(COLUMN2, OUTPUT);
   pinMode(COLUMN3, OUTPUT);
   pinMode(COLUMN4, OUTPUT);
+  slide[0][0] = false; slide[0][1] = true; slide[0][2] = true; slide[0][3] = true;
+  slide[1][0] = true; slide[1][1] = false; slide[1][2] = true; slide[1][3] = false;
+  slide[2][0] = false; slide[2][1] = true; slide[2][2] = true; slide[2][3] = true;
+  slide[3][0] = false; slide[3][1] = false; slide[3][2] = false; slide[3][3] = false;
+  slide[4][0] = true; slide[4][1] = true; slide[4][2] = true; slide[4][3] = true;
+  slide[5][0] = false; slide[5][1] = false; slide[5][2] = false; slide[5][3] = true;
+  slide[6][0] = false; slide[6][1] = false; slide[6][2] = false; slide[6][3] = true;
+  slide[7][0] = false; slide[7][1] = false; slide[7][2] = false; slide[7][3] = false;
 }
 
 void loop() {
-  //Example: shifts the characters 'A' and 'L' over the Matrix
-  matrix[0][0] = false; matrix[0][1] = true; matrix[0][2] = true; matrix[0][3] = true;
-  matrix[1][0] = true; matrix[1][1] = false; matrix[1][2] = true; matrix[1][3] = false;
-  matrix[2][0] = false; matrix[2][1] = true; matrix[2][2] = true; matrix[2][3] = true;
+  //Example: does the same as in the commit before but with the definition before the loop function.
+  for(unsigned int i = 0; i < MATRIX_WEIGHT; i++) {
+    matrix[0][i] = slide[0][i];
+    matrix[1][i] = slide[1][i];
+    matrix[2][i] = slide[2][i];
+  }
   setMatrix(matrix);
-  boolean lastrow[MATRIX_WEIGHT] = {false, false, false, false};
-  shiftMatrix(matrix, lastrow);
+  shiftMatrix(matrix, slide[3]);
   setMatrix(matrix);
-  lastrow[0] = true; lastrow[1] = true; lastrow[2] = true; lastrow[3] = true;
-  shiftMatrix(matrix, lastrow);
+  shiftMatrix(matrix, slide[4]);
   setMatrix(matrix);
-  lastrow[0] = false; lastrow[1] = false; lastrow[2] = false; lastrow[3] = true;
-  shiftMatrix(matrix, lastrow);
+  shiftMatrix(matrix, slide[5]);
   setMatrix(matrix);
-  lastrow[0] = false; lastrow[1] = false; lastrow[2] = false; lastrow[3] = true;
-  shiftMatrix(matrix, lastrow);
+  shiftMatrix(matrix, slide[6]);
   setMatrix(matrix);
-  lastrow[0] = false; lastrow[1] = false; lastrow[2] = false; lastrow[3] = false;
-  shiftMatrix(matrix, lastrow);
+  shiftMatrix(matrix, slide[7]);
   setMatrix(matrix);
   resetAll();
   delay(1000);
