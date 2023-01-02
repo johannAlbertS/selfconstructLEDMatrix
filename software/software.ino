@@ -7,9 +7,10 @@
 #define COLUMN4 2
 #define MATRIX_HEIGHT 3
 #define MATRIX_WEIGHT 4
+#define SLIDE_LENGTH 8
 
 boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT];
-boolean slide[8][MATRIX_WEIGHT];
+boolean slide[SLIDE_LENGTH][MATRIX_WEIGHT];
 
 void resetAll() {
   digitalWrite(ROW1, LOW);
@@ -77,16 +78,10 @@ void loop() {
     matrix[1][i] = slide[1][i];
     matrix[2][i] = slide[2][i];
   }
-  setMatrix(matrix);
-  shiftMatrix(matrix, slide[3]);
-  setMatrix(matrix);
-  shiftMatrix(matrix, slide[4]);
-  setMatrix(matrix);
-  shiftMatrix(matrix, slide[5]);
-  setMatrix(matrix);
-  shiftMatrix(matrix, slide[6]);
-  setMatrix(matrix);
-  shiftMatrix(matrix, slide[7]);
+  for(unsigned int i = 3; i < SLIDE_LENGTH; i++) {
+    setMatrix(matrix);
+    shiftMatrix(matrix, slide[i]);
+  }
   setMatrix(matrix);
   resetAll();
   delay(1000);
