@@ -8,6 +8,8 @@
 #define MATRIX_HEIGHT 3
 #define MATRIX_WEIGHT 4
 
+boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT];
+
 void resetAll() {
   digitalWrite(ROW1, LOW);
   digitalWrite(ROW2, LOW);
@@ -27,7 +29,27 @@ void setColumns(boolean values[MATRIX_HEIGHT][MATRIX_WEIGHT], int row) {
   }
 }
 
-boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT];
+void shiftMatrix(boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT],boolean lastrow[MATRIX_WEIGHT]) {
+  for(unsigned short i = 0; i < MATRIX_WEIGHT; i++) {
+    matrix[0][i] = matrix[1][i];
+    matrix[1][i] = matrix[2][i];
+    matrix[2][i] = lastrow[i];
+  }
+}
+
+void setMatrix(boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT]) {
+  for(unsigned int i = 0; i<2000; i++) {
+    resetAll();
+    digitalWrite(ROW1, HIGH);
+    setColumns(matrix, 1);
+    resetAll();
+    digitalWrite(ROW2, HIGH);
+    setColumns(matrix, 2);
+    resetAll();
+    digitalWrite(ROW3, HIGH);
+    setColumns(matrix, 3);
+  }
+}
 
 void setup() {
   pinMode(ROW1, OUTPUT);
@@ -37,20 +59,29 @@ void setup() {
   pinMode(COLUMN2, OUTPUT);
   pinMode(COLUMN3, OUTPUT);
   pinMode(COLUMN4, OUTPUT);
-  matrix[0][0] = false; matrix[0][1] = true; matrix[0][2] = true; matrix[0][3] = true;
-  matrix[1][0] = true; matrix[1][1] = false; matrix[1][2] = true; matrix[1][3] = false;
-  matrix[2][0] = false; matrix[2][1] = true; matrix[2][2] = true; matrix[2][3] = true;
 }
 
 void loop() {
-  //Example: prints an 'A' on the Matrix
+  //Example: shifts the characters 'A' and 'L' over the Matrix
+  matrix[0][0] = false; matrix[0][1] = true; matrix[0][2] = true; matrix[0][3] = true;
+  matrix[1][0] = true; matrix[1][1] = false; matrix[1][2] = true; matrix[1][3] = false;
+  matrix[2][0] = false; matrix[2][1] = true; matrix[2][2] = true; matrix[2][3] = true;
+  setMatrix(matrix);
+  boolean lastrow[MATRIX_WEIGHT] = {false, false, false, false};
+  shiftMatrix(matrix, lastrow);
+  setMatrix(matrix);
+  lastrow[0] = true; lastrow[1] = true; lastrow[2] = true; lastrow[3] = true;
+  shiftMatrix(matrix, lastrow);
+  setMatrix(matrix);
+  lastrow[0] = false; lastrow[1] = false; lastrow[2] = false; lastrow[3] = true;
+  shiftMatrix(matrix, lastrow);
+  setMatrix(matrix);
+  lastrow[0] = false; lastrow[1] = false; lastrow[2] = false; lastrow[3] = true;
+  shiftMatrix(matrix, lastrow);
+  setMatrix(matrix);
+  lastrow[0] = false; lastrow[1] = false; lastrow[2] = false; lastrow[3] = false;
+  shiftMatrix(matrix, lastrow);
+  setMatrix(matrix);
   resetAll();
-  digitalWrite(ROW1, HIGH);
-  setColumns(matrix, 1);
-  resetAll();
-  digitalWrite(ROW2, HIGH);
-  setColumns(matrix, 2);
-  resetAll();
-  digitalWrite(ROW3, HIGH);
-  setColumns(matrix, 3);
+  delay(1000);
 }
