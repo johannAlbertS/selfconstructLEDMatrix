@@ -13,7 +13,7 @@ typedef struct {
   boolean arr[MATRIX_HEIGHT][MATRIX_WEIGHT];
 }slide_t;
 //String that should be displayed on the matrix
-char msg[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";//LLES";
+char msg[] = "KARSTEN";
 //Array containing the description of all letters
 boolean letters[26][MATRIX_HEIGHT][MATRIX_WEIGHT];
 
@@ -72,7 +72,7 @@ void shiftMatrix(boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT],boolean lastrow[MA
  * @param matrix the Matrix to be displayed
  */
 void setMatrix(boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT]) {
-  for(unsigned int i = 0; i<2000; i++) {
+  for(unsigned int i = 0; i<3000; i++) {
     resetAll();
     digitalWrite(ROW1, HIGH);
     setColumns(matrix, 1);
@@ -201,12 +201,31 @@ void setup() {
 }
 
 void loop() {
-  //Example: prints first the character 'A' on the matrix then the character 'L'
-  for(size_t i = 0; i < strlen(msg); i++) {
-    char letter = msg[i];
-    slide_t buchstabe = interpretString(letter, letters);
-    setMatrix(buchstabe.arr);
-    resetAll();
-    delay(500);
+  boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT];
+  boolean slide[4][MATRIX_WEIGHT];
+  
+  char letter = msg[0];
+  slide_t matrixOfLet = interpretString(letter, letters);
+  for(unsigned short i = 0; i < MATRIX_WEIGHT; i++) {
+    matrix[0][i] = matrixOfLet.arr[0][i];
+    matrix[1][i] = matrixOfLet.arr[1][i];
+    matrix[2][i] = matrixOfLet.arr[2][i];   
   }
+  setMatrix(matrix);
+  for(size_t i = 1; i < strlen(msg); i++) {
+    char letter2 = msg[i];
+    slide_t matrixOfLet2 = interpretString(letter2, letters);
+    for(unsigned short o = 0; o < MATRIX_WEIGHT; o++) {
+      slide[0][o] = false;
+      slide[1][o] = matrixOfLet2.arr[0][o];
+      slide[2][o] = matrixOfLet2.arr[1][o];
+      slide[3][o] = matrixOfLet2.arr[2][o];    
+    }
+    for(unsigned int o = 0; o < MATRIX_WEIGHT; o++) {
+      shiftMatrix(matrix, slide[o]);
+      setMatrix(matrix);
+    }
+  }
+  resetAll();
+  delay(500);
 }
