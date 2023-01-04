@@ -9,9 +9,30 @@
 #define MATRIX_WEIGHT 4
 #define SLIDE_LENGTH 8
 
-boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT];
-boolean slide[SLIDE_LENGTH][MATRIX_WEIGHT];
+typedef struct {
+  boolean arr[MATRIX_HEIGHT][MATRIX_WEIGHT];
+}slide_t;
+//String that should be displayed on the matrix
+char msg[] = "AL";
+//Array containing the description of all letters
+boolean letters[26][MATRIX_HEIGHT][MATRIX_WEIGHT];
 
+/**Function to return the settings of the matrix for a specific letter
+ * @param letter the Letter for which a setting is searched
+ * @param letters a list of al settings of the matrix for all letters in the alphabet
+ * @return an structure with an two dimentional array, which can be fed in setMatrix() for example
+ */
+slide_t interpretString(char letter, boolean letters[26][MATRIX_HEIGHT][MATRIX_WEIGHT]) {
+	slide_t matrixOfLetter;
+  for(unsigned short o = 0; o < MATRIX_WEIGHT; o++) {
+    matrixOfLetter.arr[0][o] = letters[letter-65][0][o];
+    matrixOfLetter.arr[1][o] = letters[letter-65][1][o];
+    matrixOfLetter.arr[2][o] = letters[letter-65][2][o];
+  }
+  return matrixOfLetter;
+}
+
+//Function to reset all the pins to a state where no leds are on
 void resetAll() {
   digitalWrite(ROW1, LOW);
   digitalWrite(ROW2, LOW);
@@ -22,6 +43,10 @@ void resetAll() {
   digitalWrite(COLUMN4, HIGH);
 }
 
+/**Function to set the pins of all Columns
+ * @param values the matrix to be evaluated
+ * @param the row in the matrix to be evaluated
+ */
 void setColumns(boolean values[MATRIX_HEIGHT][MATRIX_WEIGHT], int row) {
   unsigned int pin = COLUMN1;
   for(unsigned int i = 0; i < MATRIX_WEIGHT; i++) {
@@ -31,6 +56,10 @@ void setColumns(boolean values[MATRIX_HEIGHT][MATRIX_WEIGHT], int row) {
   }
 }
 
+/**Function to shift the Matrix further leftwards
+ * @param matrix the matrix to be shifted
+ * @param lastrow a boolean array to be last row of the matrix
+ */
 void shiftMatrix(boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT],boolean lastrow[MATRIX_WEIGHT]) {
   for(unsigned short i = 0; i < MATRIX_WEIGHT; i++) {
     matrix[0][i] = matrix[1][i];
@@ -39,6 +68,9 @@ void shiftMatrix(boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT],boolean lastrow[MA
   }
 }
 
+/**Function to set Matrix by setting the rows and calling the function to set the columns
+ * @param matrix the Matrix to be displayed
+ */
 void setMatrix(boolean matrix[MATRIX_HEIGHT][MATRIX_WEIGHT]) {
   for(unsigned int i = 0; i<2000; i++) {
     resetAll();
@@ -61,28 +93,22 @@ void setup() {
   pinMode(COLUMN2, OUTPUT);
   pinMode(COLUMN3, OUTPUT);
   pinMode(COLUMN4, OUTPUT);
-  slide[0][0] = false; slide[0][1] = true; slide[0][2] = true; slide[0][3] = true;
-  slide[1][0] = true; slide[1][1] = false; slide[1][2] = true; slide[1][3] = false;
-  slide[2][0] = false; slide[2][1] = true; slide[2][2] = true; slide[2][3] = true;
-  slide[3][0] = false; slide[3][1] = false; slide[3][2] = false; slide[3][3] = false;
-  slide[4][0] = true; slide[4][1] = true; slide[4][2] = true; slide[4][3] = true;
-  slide[5][0] = false; slide[5][1] = false; slide[5][2] = false; slide[5][3] = true;
-  slide[6][0] = false; slide[6][1] = false; slide[6][2] = false; slide[6][3] = true;
-  slide[7][0] = false; slide[7][1] = false; slide[7][2] = false; slide[7][3] = false;
+  
+  letters[0][0][0] = false; letters[0][0][1] = true; letters[0][0][2] = true; letters[0][0][3] = true;
+  letters[0][1][0] = true; letters[0][1][1] = false; letters[0][1][2] = true; letters[0][1][3] = false;
+  letters[0][2][0] = false; letters[0][2][1] = true; letters[0][2][2] = true; letters[0][2][3] = true; 
+  letters[11][0][0] = true; letters[11][0][1] = true; letters[11][0][2] = true; letters[11][0][3] = true;
+  letters[11][1][0] = false; letters[11][1][1] = false; letters[11][1][2] = false; letters[11][1][3] = true;
+  letters[11][2][0] = false; letters[11][2][1] = false; letters[11][2][2] = false; letters[11][2][3] = true;
 }
 
 void loop() {
-  //Example: does the same as in the commit before but with the definition before the loop function.
-  for(unsigned int i = 0; i < MATRIX_WEIGHT; i++) {
-    matrix[0][i] = slide[0][i];
-    matrix[1][i] = slide[1][i];
-    matrix[2][i] = slide[2][i];
+  //Example: prints first the character 'A' on the matrix then the character 'L'
+  for(size_t i = 0; i < strlen(msg); i++) {
+    char letter = msg[i];
+    slide_t buchstabe = interpretString(letter, letters);
+    setMatrix(buchstabe.arr);
+    resetAll();
+    delay(500);
   }
-  for(unsigned int i = 3; i < SLIDE_LENGTH; i++) {
-    setMatrix(matrix);
-    shiftMatrix(matrix, slide[i]);
-  }
-  setMatrix(matrix);
-  resetAll();
-  delay(1000);
 }
